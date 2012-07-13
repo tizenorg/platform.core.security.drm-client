@@ -1,0 +1,78 @@
+drm-client (0.0.8-0) unstable; urgency=low
+
+  * Spell check for constraint word
+  * Modification by Harsha Shekar <h.shekar@samsung.com>
+  * Git: slp/pkgs/d/drm-client
+  * Tag: drm-client_0.0.8-0
+
+ -- Harsha Shekar <h.shekar@samsung.com>  Tue, 22 May 2012 17:03:07 +0900
+
+drm-client (0.0.7-0) unstable; urgency=low
+
+  * Modified TCs and test utility
+  * Modification by Mahendra <mahendra.p@samsung.com> Ravi S <ravi.cs@samsung.com>
+  * Git: slp/pkgs/d/drm-client
+  * Tag: drm-client_0.0.7-0
+
+ -- Harsha Shekar <h.shekar@samsung.com>  Sat, 12 May 2012 16:45:34 +0900
+
+drm-client (0.0.6-0) unstable; urgency=low
+
+  * Implementation of key service APIs like ROAP, SETAS etc
+  * Modification by Harsha Shekar <h.shekar@samsung.com>
+  * Git: slp/pkgs/d/drm-client
+  * Tag: drm-client_0.0.6-0
+
+ -- Harsha Shekar <h.shekar@samsung.com>  Thu, 10 May 2012 10:10:50 +0900
+
+drm-client (0.0.5-1) unstable; urgency=low
+
+  * spec file modified
+  * Modification by Harsha Shekar <h.shekar@samsung.com>
+  * Git: slp/pkgs/d/drm-client
+  * Tag: drm-client_0.0.5-1
+
+ -- Harsha Shekar <h.shekar@samsung.com>  Tue, 08 May 2012 18:15:30 +0900
+
+drm-client (0.0.5-0) unstable; urgency=low
+
+  * Removed temporarily defined TIZEN_DRM_ERROR_CLASS from drm_client_types.h
+  * Modification by Harsha Shekar <h.shekar@samsung.com>
+  * Git: slp/pkgs/d/drm-client
+  * Tag: drm-client_0.0.5-0
+
+ -- Harsha Shekar <h.shekar@samsung.com>  Tue, 20 Mar 2012 11:31:09 +0530
+
+drm-client (0.0.4-0) unstable; urgency=low
+
+  * Addition of new DRM C APIs (get_secure_clock, register_ro, register_file, unregister_file)
+  * Modification by Mahendra Kumar Prajapat <mahendra.p@samsung.com>
+  * Modification by Harsha Shekar <h.shekar@samsung.com>
+  * Git: slp/pkgs/d/drm-client
+  * Tag: drm-client_0.0.4-0
+
+ -- Harsha Shekar <h.shekar@samsung.com>  Fri, 16 Mar 2012 20:35:57 +0530
+
+drm-client (0.0.3-0) unstable; urgency=low
+
+  * Converted time constraints in struct tm format
+  * Modification by Mahendra Kumar Prajapat <mahendra.p@samsung.com>
+  * Git: slp/pkgs/d/drm-client
+  * Tag: drm-client_0.0.3-0
+
+ -- Harsha Shekar <h.shekar@samsung.com>  Thu, 08 Mar 2012 16:57:42 +0530
+
+drm-client (0.0.2-0) unstable; urgency=low
+
+  * Added Drm Client files and folders into repository
+  * Modification by Harsha Shekar <h.shekar@samsung.com>
+  * Git: slp/pkgs/d/drm-client
+  * Tag: drm-client_0.0.2-0
+
+ -- Harsha Shekar <h.shekar@samsung.com>  Wed, 07 Mar 2012 11:37:21 +0530
+
+drm-client (0.0.1-0) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Mahendra Kumar Prajapat <mahendra.p@samsung.com>  Thu, 23 Feb 2012 11:34:57 +0530
