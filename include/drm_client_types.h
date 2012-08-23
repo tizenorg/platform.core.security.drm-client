@@ -43,6 +43,7 @@ extern "C" {
 
 #include "tizen_error.h"
 
+
 /******************************************************************/
 
 /*
@@ -134,6 +135,36 @@ extern "C" {
 * Maximum length of IP Address
 */
 #define DRM_MAX_LEN_IP_ADDR 		(64)
+
+/*
+ * Max length of APP ID
+ */
+#define DRM_MAX_LEN_APP_ID 		(15)
+
+/*
+ * Max length of User ID
+ */
+#define DRM_MAX_LEN_USER_GUID 	(15)
+
+/*
+ * Max length of Device ID
+ */
+#define DRM_MAX_LEN_DEVICE_ID 	(15)
+
+/*
+ * Max length of Order ID
+ */
+#define DRM_MAX_LEN_ORDER_ID 	(15)
+
+/*
+ * Max length of Service ID
+ */
+#define DRM_MAX_LEN_SERVICE_ID	(31)
+
+/*
+ * Max length of Account ID
+ */
+#define DRM_MAX_LEN_ACCOUNT_ID 	(31)
 
 /****************************************************************/
 
@@ -475,6 +506,18 @@ typedef enum {
 } drm_web_server_result_code_e;
 
 /**
+ * @enum drm_initiator_type
+ * @brief DRM Initiator type.
+ */
+typedef enum {
+	DRM_INITIATOR_TYPE_NONE = -1,
+	DRM_INITIATOR_TYPE_INITIATOR_URL = 0,
+	DRM_INITIATOR_TYPE_LICENSE_ACQ,
+	DRM_INITIATOR_TYPE_JOIN_DOMAIN,
+	DRM_INITIATOR_TYPE_LEAVE_DOMAIN
+} drm_initiator_type;
+
+/**
  * @struct drm_content_info_s
  * @brief DRM content info structure.
  */
@@ -803,6 +846,19 @@ typedef struct {
 }drm_register_lic_resp_s;
 
 /**
+ * @struct 	drm_custom_data_info_s
+ * @brief 	DRM Custom Data Information.
+ */
+typedef struct {
+	char app_id[DRM_MAX_LEN_APP_ID + 1]; 			/** App ID */
+	char user_guid[DRM_MAX_LEN_USER_GUID +1]; 	/** User GID */
+	char device_id[DRM_MAX_LEN_DEVICE_ID + 1];	 	/** Device ID */
+	char order_id[DRM_MAX_LEN_ORDER_ID + 1]; 			/** Order ID */
+	char service_id[DRM_MAX_LEN_SERVICE_ID + 1]; 		/** Service ID */
+	char account_id[DRM_MAX_LEN_ACCOUNT_ID + 1]; 		/** Account ID */
+} drm_custom_data_info_s;
+
+/**
  * @struct drm_initiator_info_s
  * @brief DRM License Initiator Information structure.
  */
@@ -815,6 +871,12 @@ typedef struct {
 
 	/** Callback for status update */
 	drm_operation_cb_s operation_callback;
+
+	/** Initiator Type */
+	drm_initiator_type init_type;
+
+	/** Custom Data */
+	drm_custom_data_info_s custom_data;
 }drm_initiator_info_s;
 
 /**
@@ -989,6 +1051,14 @@ typedef struct {
 	drm_setas_category_e setas_cat;			/** SetAs Category */
 } drm_register_setas_info_s;
 
+/**
+ * @struct	drm_register_setas_resp_data_s
+ * @brief	DRM Stack Response Data containing the GMT expiry
+ * 		time corresponding to a given content
+ */
+typedef struct {
+	struct tm 	time_expiry;						/** Expiry time*/
+} drm_register_setas_resp_data_s;
 /**
  * @struct 	drm_unregister_setas_info_s
  * @brief 	DRM Unregister SetAs Info.

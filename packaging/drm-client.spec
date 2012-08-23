@@ -1,12 +1,13 @@
 Name:       drm-client
 Summary:    DRM client Package
-Version:    0.0.8
+Version:    0.0.23
 Release:    0
 Group:      TO_BE/FILLED_IN
 License:    Apache
 Source0:    %{name}-%{version}.tar.gz
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(capi-base-common)
+BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  cmake
 
 %description
@@ -41,3 +42,14 @@ rm -rf %{buildroot}
 %{_includedir}/drm-client/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/drm-client.pc
+
+%clean
+rm -rf CMakeCache.txt
+rm -rf CMakeFiles
+rm -rf cmake_install.cmake
+rm -rf Makefile
+rm -rf install_manifest.txt
+rm -rf *.pc
+rm -rf documentation.list
+
+rm -rf libdrm-client.so libdrm-client.so.0 libdrm-client.so.0.0.1

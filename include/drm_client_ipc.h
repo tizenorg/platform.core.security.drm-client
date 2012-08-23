@@ -67,7 +67,17 @@ extern "C" {
 /**
 * Maximum Read/Write Chunk Size
 */
-#define DRM_MAX_CHUNK_SIZE (100 * 1024)
+#define DRM_MAX_CHUNK_SIZE (10 * 1024)
+
+/**
+* Maximum concurrent clients supported
+*/
+#define DRM_MAX_CLIENT_SUPPORTED 5
+
+/**
+* Maximum callback data size
+*/
+#define DRM_MAX_CB_DATA_SIZE 256
 
 
 
@@ -90,14 +100,59 @@ typedef enum {
 } drm_request_api_e;
 
 /**
+ * @struct drm_client_cb_data_s
+ * @brief DRM operation callback information structure
+ * with additional information.
+ */
+typedef struct
+{
+	/** Client Id */
+	int client_id;
+
+	/** Callback operation info */
+	drm_user_operation_info_s callback_operation_info;
+
+	/** Callback user data */
+	char call_bk_data[DRM_MAX_CB_DATA_SIZE];
+} drm_client_cb_data_s;
+
+/**
+ * @struct 	drm_client_cb_info_s
+ * @brief 	Client Callback info.
+ * @remark	Stores details about Registered client callbacks
+ */
+typedef struct {
+
+	/** Client Id */
+	int client_id;
+
+	/** Callback */
+	drm_operation_cb_s operation_callback;
+} drm_client_cb_info_s;
+
+/**
  * @struct 	drm_client_info_s
  * @brief 	Client Information structure.
  * @remark	It can be used to track drm clients.
- * 			It can be extended to add more parameters like pid, uid etc.
  */
 typedef struct {
+	/** Active state for structure */
+	int active;
+
 	/** Client Id */
 	int client_id;
+
+	/** Process Id */
+	int p_id;
+
+	/** Thread Id */
+	int thread_id;
+
+	/** Sync Socket */
+	int sync_sock_fd;
+
+	/** Async Socket */
+	int async_sock_fd;
 } drm_client_info_s;
 
 /**

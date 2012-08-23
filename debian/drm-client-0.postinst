@@ -1,8 +1,0 @@
-#!/bin/sh
-#if [ ${USER} = "root" ]
-#then
-# Do post installation operations as a root
-#else
-# Do post installation operations as a non-root
-#fi
-

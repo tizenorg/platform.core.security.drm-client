@@ -22,6 +22,7 @@
  *
  */
 
+
 /**
  * @file 		drm_client.cpp
  * @brief       DRM Client API defintions.
@@ -40,9 +41,13 @@
 #include "drm_client_log.h"
 //#include "security-server.h"
 
+#include <glib.h>
+
 #ifndef EXPORT_API
 #define EXPORT_API __attribute__((visibility("default")))
 #endif
+
+
 
 /**
  *  Private function
@@ -55,7 +60,6 @@
  * @since       0.1
  */
 static drm_file_type_e _drm_client_get_file_type(const char* file_path);
-
 
 /**
  *  An application can check that a file is DRM file
@@ -77,14 +81,12 @@ static drm_file_type_e _drm_client_get_file_type(const char* file_path);
 EXPORT_API int drm_is_drm_file(const char *file_path,
 		drm_bool_type_e *is_drm_file)
 {
+	DRM_CLIENT_LOG("Enter: file_path = %s", (!file_path) ? NULL:file_path);
 	drm_request_data_s req_data;
 	drm_response_data_s resp_data;
 	int ret_comm = 0;
 	drm_file_type_e file_type = DRM_TYPE_UNDEFINED;
-
-	/* memset the structures */
-	memset(&req_data, 0x0, sizeof(drm_request_data_s));
-	memset(&resp_data, 0x0, sizeof(drm_response_data_s));
+	int ret_cpy = 0;
 
 	/* Check input parameters */
 	if (!file_path || '\0' == file_path[0] || !is_drm_file) {
@@ -92,8 +94,6 @@ EXPORT_API int drm_is_drm_file(const char *file_path,
 				file_path, is_drm_file);
 		return DRM_RETURN_INVALID_ARG;
 	}
-
-	DRM_CLIENT_LOG("file_path = %s", file_path);
 
 	file_type = _drm_client_get_file_type(file_path);
 
@@ -108,11 +108,21 @@ EXPORT_API int drm_is_drm_file(const char *file_path,
 		break;
 
 	case DRM_TYPE_DIVX: {
+
+		/* memset the structures */
+		memset(&req_data, 0x0, sizeof(drm_request_data_s));
+		memset(&resp_data, 0x0, sizeof(drm_response_data_s));
+
 		/* In this case, further analysis of headers required to identify DRM file */
 		/* Contact the server to perform operations */
 
 		/* Store the input parameters to the Request Data structure to be sent to server */
-		memcpy(req_data.fixed_data.request_data, file_path, DRM_MAX_LEN_FILEPATH);
+		if ((ret_cpy = g_strlcpy(req_data.fixed_data.request_data, file_path,
+				DRM_MAX_LEN_FILEPATH)) >= DRM_MAX_LEN_FILEPATH) {
+			DRM_CLIENT_EXCEPTION("file_path = %s, filepath_len = %d, ret_cpy = %d",
+					file_path, strlen(file_path), ret_cpy);
+			return DRM_RETURN_INVALID_ARG;
+		}
 
 		/* Tell the server which API to be used */
 		req_data.fixed_data.api_name = DRM_IS_DRM_FILE;
@@ -148,12 +158,12 @@ EXPORT_API int drm_is_drm_file(const char *file_path,
 		goto ErrorExit;
 	}
 
-	DRM_CLIENT_LOG("drm_is_drm_file Success!!, *is_drm_file = %d",
+	DRM_CLIENT_LOG("Exit:Success!!, is_drm_file = %d",
 			*is_drm_file);
 	return DRM_RETURN_SUCCESS;
 
 ErrorExit:
-	DRM_CLIENT_EXCEPTION("drm_is_drm_file failed!!, *is_drm_file = %d",
+	DRM_CLIENT_EXCEPTION("Exit:failed!!, is_drm_file = %d",
 			*is_drm_file);
 	return DRM_RETURN_INTERNAL_ERROR;
 
@@ -174,6 +184,8 @@ ErrorExit:
  */
 EXPORT_API int drm_get_file_type(const char *file_path, drm_file_type_e *file_type)
 {
+	DRM_CLIENT_LOG("Enter: file_path = %s", (!file_path) ? NULL:file_path);
+
 	/* Check input parameters */
 	if (!file_path || '\0' == file_path[0] || !file_type) {
 		DRM_CLIENT_EXCEPTION("Invalid Arg!!, file_path = %p, file_type = %p",
@@ -181,10 +193,8 @@ EXPORT_API int drm_get_file_type(const char *file_path, drm_file_type_e *file_ty
 		return DRM_RETURN_INVALID_ARG;
 	}
 
-	DRM_CLIENT_LOG("file_path = %s", file_path);
 	*file_type = _drm_client_get_file_type(file_path);
-	DRM_CLIENT_LOG("*file_type = %d", *file_type);
-	DRM_CLIENT_LOG("drm_get_file_type Success!!");
+	DRM_CLIENT_LOG("Exit:Success!! file_type = %d", *file_type);
 	return DRM_RETURN_SUCCESS;
 }
 
@@ -207,11 +217,14 @@ EXPORT_API int drm_get_license_status(const char *file_path,
 		drm_permission_type_e perm_type,
 		drm_license_status_e *license_status)
 {
+	DRM_CLIENT_LOG("Enter: file_path = %s, perm_type = %d",
+			(!file_path) ? NULL:file_path, perm_type);
+
 	drm_request_data_s req_data;
 	drm_response_data_s resp_data;
 	int ret_comm = 0;
-	int retval = 0;
 	drm_result_e result = DRM_RETURN_SUCCESS;
+	int ret_cpy = 0;
 
 	/* memset the structures */
 	memset(&req_data, 0x0, sizeof(drm_request_data_s));
@@ -224,10 +237,14 @@ EXPORT_API int drm_get_license_status(const char *file_path,
 		return DRM_RETURN_INVALID_ARG;
 	}
 
-	DRM_CLIENT_LOG("file_path = %s, perm_type = %d", file_path, perm_type);
-
 	/* Store the input parameters to the Request Data structure to be sent to server */
-	memcpy(req_data.fixed_data.request_data, file_path, DRM_MAX_LEN_FILEPATH);
+	if ((ret_cpy = g_strlcpy(req_data.fixed_data.request_data, file_path,
+			DRM_MAX_LEN_FILEPATH)) >= DRM_MAX_LEN_FILEPATH) {
+		DRM_CLIENT_EXCEPTION("file_path = %s, filepath_len = %d, ret_cpy = %d",
+				file_path, strlen(file_path), ret_cpy);
+		return DRM_RETURN_INVALID_ARG;
+	}
+
 	req_data.fixed_data.permission_type = perm_type;
 
 	/* Tell the server which API to be used */
@@ -257,9 +274,9 @@ EXPORT_API int drm_get_license_status(const char *file_path,
 
 ErrorExit:
 	if (result != DRM_RETURN_SUCCESS) {
-		DRM_CLIENT_EXCEPTION("drm_get_license_status failed!!");
+		DRM_CLIENT_EXCEPTION("Exit:failed!!, result = 0x%x", result);
 	} else {
-		DRM_CLIENT_LOG("drm_get_license_status Success!!");
+		DRM_CLIENT_LOG("Exit:Success!!, result = 0x%x", result);
 	}
 
 	return result;
@@ -283,11 +300,13 @@ ErrorExit:
 EXPORT_API int drm_get_content_info(const char *file_path,
 		drm_content_info_s *content_info)
 {
+	DRM_CLIENT_LOG("Enter: file_path = %s", (!file_path) ? NULL:file_path);
+
 	drm_request_data_s req_data;
 	drm_response_data_s resp_data;
 	int ret_comm = 0;
 	drm_result_e result = DRM_RETURN_SUCCESS;
-	int retval = 0;
+	int ret_cpy = 0;
 
 	/* memset the structures */
 	memset(&req_data, 0x0, sizeof(drm_request_data_s));
@@ -300,13 +319,16 @@ EXPORT_API int drm_get_content_info(const char *file_path,
 		return DRM_RETURN_INVALID_ARG;
 	}
 
-	DRM_CLIENT_LOG("file_path = %s", file_path);
-
 	/* memset the output structure */
 	memset(content_info, 0x00, sizeof(drm_content_info_s));
 
 	/* Store the input parameters to the Request Data structure to be sent to server */
-	memcpy(req_data.fixed_data.request_data, file_path, DRM_MAX_LEN_FILEPATH);
+	if ((ret_cpy = g_strlcpy(req_data.fixed_data.request_data, file_path,
+			DRM_MAX_LEN_FILEPATH)) >= DRM_MAX_LEN_FILEPATH) {
+		DRM_CLIENT_EXCEPTION("file_path = %s, filepath_len = %d, ret_cpy = %d",
+				file_path, strlen(file_path), ret_cpy);
+		return DRM_RETURN_INVALID_ARG;
+	}
 
 	/* Tell the server which API to be used */
 	req_data.fixed_data.api_name = DRM_GET_CONTENT_INFO;
@@ -343,10 +365,10 @@ EXPORT_API int drm_get_content_info(const char *file_path,
 	DRM_CLIENT_LOG("content_info->title = %s", content_info->title);
 
 ErrorExit:
-	if (result != DRM_RETURN_SUCCESS) {
-		DRM_CLIENT_EXCEPTION("drm_get_content_info failed!!");
+if (result != DRM_RETURN_SUCCESS) {
+		DRM_CLIENT_EXCEPTION("Exit:failed!!, result = 0x%x", result);
 	} else {
-		DRM_CLIENT_LOG("drm_get_content_info Success!!");
+		DRM_CLIENT_LOG("Exit:Success!!, result = 0x%x", result);
 	}
 
 	return result;
@@ -369,11 +391,12 @@ ErrorExit:
 EXPORT_API int drm_get_file_info(const char *file_path,
 		drm_file_info_s *fileInfo)
 {
+	DRM_CLIENT_LOG("Enter: file_path = %s", (!file_path) ? NULL:file_path);
 	drm_request_data_s req_data;
 	drm_response_data_s resp_data;
 	int ret_comm = 0;
 	drm_result_e result = DRM_RETURN_SUCCESS;
-	int retval = 0;
+	int ret_cpy = 0;
 
 	/* memset the structures */
 	memset(&req_data, 0x0, sizeof(drm_request_data_s));
@@ -392,7 +415,12 @@ EXPORT_API int drm_get_file_info(const char *file_path,
 	memset(fileInfo, 0x00, sizeof(drm_file_info_s));
 
 	/* Store the input parameters to the Request Data structure to be sent to server */
-	memcpy(req_data.fixed_data.request_data, file_path, DRM_MAX_LEN_FILEPATH);
+	if ((ret_cpy = g_strlcpy(req_data.fixed_data.request_data, file_path,
+			DRM_MAX_LEN_FILEPATH)) >= DRM_MAX_LEN_FILEPATH) {
+		DRM_CLIENT_EXCEPTION("file_path = %s, filepath_len = %d, ret_cpy = %d",
+				file_path, strlen(file_path), ret_cpy);
+		return DRM_RETURN_INVALID_ARG;
+	}
 
 	/* Tell the server which API to be used */
 	req_data.fixed_data.api_name = DRM_GET_FILE_INFO;
@@ -422,9 +450,9 @@ EXPORT_API int drm_get_file_info(const char *file_path,
 
 ErrorExit:
 	if (result != DRM_RETURN_SUCCESS) {
-		DRM_CLIENT_EXCEPTION("drm_get_file_info failed!!");
+		DRM_CLIENT_EXCEPTION("Exit:failed!!, result = 0x%x", result);
 	} else {
-		DRM_CLIENT_LOG("drm_get_file_info Success!!");
+		DRM_CLIENT_LOG("Exit:Success!!, result = 0x%x", result);
 	}
 	return result;
 }
@@ -449,11 +477,14 @@ EXPORT_API int drm_get_constraint_info(const char *file_path,
 		drm_permission_type_e perm_type,
 		drm_constraint_info_s *constraint_info)
 {
+	DRM_CLIENT_LOG("Enter: file_path = %s, perm_type = %d",
+			(!file_path) ? NULL:file_path, perm_type);
+
 	drm_request_data_s req_data;
 	drm_response_data_s resp_data;
 	int ret_comm = 0;
 	drm_result_e result = DRM_RETURN_SUCCESS;
-	int retval = 0;
+	int ret_cpy = 0;
 
 	/* memset the structures */
 	memset(&req_data, 0x0, sizeof(drm_request_data_s));
@@ -472,7 +503,12 @@ EXPORT_API int drm_get_constraint_info(const char *file_path,
 	memset(constraint_info, 0x00, sizeof(drm_constraint_info_s));
 
 	/* Store the input parameters to the Request Data structure to be sent to server */
-	memcpy(req_data.fixed_data.request_data, file_path, DRM_MAX_LEN_FILEPATH);
+	if ((ret_cpy = g_strlcpy(req_data.fixed_data.request_data, file_path,
+			DRM_MAX_LEN_FILEPATH)) >= DRM_MAX_LEN_FILEPATH) {
+		DRM_CLIENT_EXCEPTION("file_path = %s, filepath_len = %d, ret_cpy = %d",
+				file_path, strlen(file_path), ret_cpy);
+		return DRM_RETURN_INVALID_ARG;
+	}
 	req_data.fixed_data.permission_type = perm_type;
 
 	/* Tell the server which API to be used */
@@ -500,9 +536,9 @@ EXPORT_API int drm_get_constraint_info(const char *file_path,
 
 ErrorExit:
 	if (result != DRM_RETURN_SUCCESS) {
-		DRM_CLIENT_EXCEPTION("drm_get_constraint_info failed!!");
+		DRM_CLIENT_EXCEPTION("Exit:failed!!, result = 0x%x", result);
 	} else {
-		DRM_CLIENT_LOG("drm_get_constraint_info Success!!");
+		DRM_CLIENT_LOG("Exit:Success!!, result = 0x%x", result);
 	}
 	return result;
 }
@@ -529,11 +565,11 @@ EXPORT_API int drm_is_action_allowed(drm_action_type_e action,
 		drm_action_allowed_data_s *action_data,
 		drm_bool_type_e *is_allowed)
 {
+	DRM_CLIENT_LOG("Enter: action = %d, action_data = %p", action, action_data);
 	drm_request_data_s req_data;
 	drm_response_data_s resp_data;
 	int ret_comm = 0;
 	drm_result_e result = DRM_RETURN_SUCCESS;
-	int retval = 0;
 
 	/* memset the structures */
 	memset(&req_data, 0x0, sizeof(drm_request_data_s));
@@ -605,9 +641,9 @@ EXPORT_API int drm_is_action_allowed(drm_action_type_e action,
 
 ErrorExit:
 	if (result != DRM_RETURN_SUCCESS) {
-		DRM_CLIENT_EXCEPTION("drm_is_action_allowed failed!!");
+		DRM_CLIENT_EXCEPTION("Exit:failed!!, result = 0x%x", result);
 	} else {
-		DRM_CLIENT_LOG("drm_is_action_allowed Success!!");
+		DRM_CLIENT_LOG("Exit:Success!!, result = 0x%x", result);
 	}
 	return result;
 }
@@ -655,12 +691,14 @@ ErrorExit:
  */
 EXPORT_API int drm_get_data(drm_data_type_e data_type, void *input, void *output)
 {
+	DRM_CLIENT_LOG("Enter: data_type = %d, input = %p, output = %p",
+			data_type, input, output);
 	/* Local Variables */
 	drm_result_e result = DRM_RETURN_SUCCESS;
 	drm_request_data_s req_data;
 	drm_response_data_s resp_data;
 	int ret_comm = 0;
-	int retval = 0;
+	int ret_cpy = 0;
 
 	/* memset the structures */
 	memset(&req_data, 0x0, sizeof(drm_request_data_s));
@@ -685,7 +723,13 @@ EXPORT_API int drm_get_data(drm_data_type_e data_type, void *input, void *output
 		}
 
 		/* Copy the input parameter to be sent as Request Data */
-		memcpy(req_data.fixed_data.request_data, input, DRM_MAX_LEN_FILEPATH);
+		if ((ret_cpy = g_strlcpy(req_data.fixed_data.request_data,
+				(const gchar*) input, DRM_MAX_LEN_FILEPATH))
+				>= DRM_MAX_LEN_FILEPATH) {
+			DRM_CLIENT_EXCEPTION("file_path = %s, filepath_len = %d, ret_cpy = %d",
+					(const char*)input, strlen(((const char*)input)), ret_cpy);
+			return DRM_RETURN_INVALID_ARG;
+		}
 	}
 		break;
 	default:
@@ -759,7 +803,8 @@ EXPORT_API int drm_get_data(drm_data_type_e data_type, void *input, void *output
 			break;
 
 		case DRM_DATA_TYPE_TRANSACTION_TRACKING_ID: {
-			drm_transaction_id_info_s transid_info = { 0, };
+			drm_transaction_id_info_s transid_info;
+			memset(&transid_info,0,sizeof(transid_info));
 
 			/* Copy from response data into local structure */
 			memcpy(&transid_info, resp_data.fixed_data.response_data,
@@ -776,7 +821,8 @@ EXPORT_API int drm_get_data(drm_data_type_e data_type, void *input, void *output
 
 		case DRM_DATA_TYPE_DIVX_REGISTRATION_CODE: {
 
-			drm_code_info_s registration_info = { 0, };
+			drm_code_info_s registration_info;
+			memset(&registration_info,0,sizeof(registration_info));
 
 			/* Copy from response data into local structure */
 			memcpy(&registration_info, resp_data.fixed_data.response_data,
@@ -794,7 +840,8 @@ EXPORT_API int drm_get_data(drm_data_type_e data_type, void *input, void *output
 
 		case DRM_DATA_TYPE_DIVX_DEREGISTRATION_CODE: {
 
-			drm_code_info_s deregis_info = { 0, };
+			drm_code_info_s deregis_info;
+			memset(&deregis_info,0,sizeof(deregis_info));
 
 			/* Copy from response data into local structure */
 			memcpy(&deregis_info, resp_data.fixed_data.response_data,
@@ -818,12 +865,12 @@ EXPORT_API int drm_get_data(drm_data_type_e data_type, void *input, void *output
 	}
 
 	/* Success */
-	DRM_CLIENT_LOG("Success:result=0x%x",result);
+	DRM_CLIENT_LOG("Exit:Success:result=0x%x",result);
 	return result;
 
 ErrorExit:
 	/* Failure */
-	DRM_CLIENT_EXCEPTION("failed:result=0x%x",result);
+	DRM_CLIENT_EXCEPTION("Exit:failed:result=0x%x",result);
 	return result;
 }
 
@@ -896,7 +943,7 @@ ErrorExit:
  *
  * 				if request_type = DRM_REQUEST_TYPE_REGISTER_SETAS
  * 				then input type: input = pointer to struct drm_register_setas_info_s
- * 				and output type: output = NULL
+ * 				and output type: output = pointer to the struct drm_register_setas_resp_data_s
  *
  * 				if request_type = DRM_REQUEST_TYPE_UNREGISTER_SETAS
  * 				then input type: input = pointer to struct drm_unregister_setas_info_s
@@ -908,12 +955,14 @@ ErrorExit:
 EXPORT_API int drm_process_request(drm_request_type_e request_type,
 		void *input, void *output)
 {
+	DRM_CLIENT_LOG("Enter: request_type = %d, input = %p, output = %p",
+			request_type, input, output);
 	/* Local Variables */
 	drm_result_e result = DRM_RETURN_SUCCESS;
 	drm_request_data_s req_data;
 	drm_response_data_s resp_data;
 	int ret_comm = 0;
-	int retval = 0;
+	int ret_cpy = 0;
 
 	/* memset the structures */
 	memset(&req_data, 0x0, sizeof(drm_request_data_s));
@@ -929,7 +978,13 @@ EXPORT_API int drm_process_request(drm_request_type_e request_type,
 			return DRM_RETURN_INVALID_ARG;
 		} else {
 			/* Copy the input to Request Structure */
-			memcpy(req_data.fixed_data.request_data, input, DRM_MAX_LEN_FILEPATH);
+			if ((ret_cpy = g_strlcpy(req_data.fixed_data.request_data,
+					(const gchar*) input, DRM_MAX_LEN_FILEPATH))
+					>= DRM_MAX_LEN_FILEPATH) {
+				DRM_CLIENT_EXCEPTION("file_path = %s, filepath_len = %d, ret_cpy = %d",
+						(const char*)input, strlen(((const char*)input)), ret_cpy);
+				return DRM_RETURN_INVALID_ARG;
+			}
 		}
 	}
 		break;
@@ -1222,8 +1277,8 @@ EXPORT_API int drm_process_request(drm_request_type_e request_type,
 		switch (request_type) {
 		case DRM_REQUEST_TYPE_SUBMIT_INITIATOR_URL: {
 
-			drm_web_server_resp_data_s ws_resp_data = { 0, };
-
+			drm_web_server_resp_data_s ws_resp_data;
+			memset(&ws_resp_data,0,sizeof(ws_resp_data));
 			/* Copy from response data into local structure */
 			memcpy(&ws_resp_data, resp_data.fixed_data.response_data,
 					sizeof(drm_web_server_resp_data_s));
@@ -1240,7 +1295,8 @@ EXPORT_API int drm_process_request(drm_request_type_e request_type,
 
 		case DRM_REQUEST_TYPE_REGISTER_LICENSE: {
 
-			drm_register_lic_resp_s lic_resp = { 0, };
+			drm_register_lic_resp_s lic_resp;
+			memset(&lic_resp,0,sizeof(lic_resp));
 
 			/* Copy from response data into local structure */
 			memcpy(&lic_resp, resp_data.fixed_data.response_data,
@@ -1253,6 +1309,19 @@ EXPORT_API int drm_process_request(drm_request_type_e request_type,
 		}
 			break;
 
+		case DRM_REQUEST_TYPE_REGISTER_SETAS: {
+
+			DRM_CLIENT_LOG("Register Setas Successful");
+			drm_register_setas_resp_data_s setas_resp = { 0, };
+
+			/* Copy from response data into local structure */
+			memcpy(&setas_resp, resp_data.fixed_data.response_data,
+			sizeof(drm_register_setas_resp_data_s));
+
+			/* Now copy into output parameter */
+			memcpy(output, &setas_resp, sizeof(drm_register_setas_resp_data_s));
+		}
+			break;
 		case DRM_REQUEST_TYPE_REGISTER_FILE:
 		case DRM_REQUEST_TYPE_UNREGISTER_FILE:
 		case DRM_REQUEST_TYPE_UNREGISTER_ALL_FILES:
@@ -1263,7 +1332,6 @@ EXPORT_API int drm_process_request(drm_request_type_e request_type,
 		case DRM_REQUEST_TYPE_REGISTER_MOVE_FILE:
 		case DRM_REQUEST_TYPE_INSERT_EXT_MEMORY:
 		case DRM_REQUEST_TYPE_EXTRACT_EXT_MEMORY:
-		case DRM_REQUEST_TYPE_REGISTER_SETAS:
 		case DRM_REQUEST_TYPE_UNREGISTER_SETAS:
 			DRM_CLIENT_LOG("No output parameters to be handled!!");
 			break;
@@ -1279,24 +1347,24 @@ EXPORT_API int drm_process_request(drm_request_type_e request_type,
 ErrorExit:
 
 	/* Free Request Data memory */
-	for (int i = 0; i < req_data.fixed_data.num_data_items; i++) {
+	for (unsigned int i = 0; i < req_data.fixed_data.num_data_items; i++) {
 		if (req_data.data_items[i])
 			free(req_data.data_items[i]);
 	}
 
 	/* Free Response Data memory */
-	for (int i = 0; i < resp_data.fixed_data.num_data_items; i++) {
+	for (unsigned int i = 0; i < resp_data.fixed_data.num_data_items; i++) {
 		if (resp_data.data_items[i])
 			free(resp_data.data_items[i]);
 	}
 
 	if (DRM_RETURN_SUCCESS == result) {
 		/* Success */
-		DRM_CLIENT_LOG("Success:result=0x%x",result);
+		DRM_CLIENT_LOG("Exit:Success:result=0x%x",result);
 		return result;
 	} else {
 		/* Failure */
-		DRM_CLIENT_EXCEPTION("failed:result=0x%x",result);
+		DRM_CLIENT_EXCEPTION("Exit:failed:result=0x%x",result);
 		return result;
 	}
 

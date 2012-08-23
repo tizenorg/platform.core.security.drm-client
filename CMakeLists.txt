@@ -25,7 +25,7 @@ SET(EXTRA_CXXFLAGS "${EXTRA_CXXFLAGS} ${extapi}")
 #SET(EXTRA_CXXFLAGS "${EXTRA_CXXFLAGS} ${DEBUG}")
 
 INCLUDE(FindPkgConfig)
-pkg_check_modules(exppkgs REQUIRED dlog capi-base-common)
+pkg_check_modules(exppkgs REQUIRED dlog capi-base-common glib-2.0)
 
 FOREACH(flag ${exppkgs_CFLAGS})
 	SET(EXTRA_CXXFLAGS "${EXTRA_CXXFLAGS} ${flag}")
