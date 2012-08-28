@@ -154,7 +154,7 @@ extern "C" {
 /*
  * Max length of Order ID
  */
-#define DRM_MAX_LEN_ORDER_ID 	(15)
+#define DRM_MAX_LEN_ORDER_ID 	(23)
 
 /*
  * Max length of Service ID

@@ -72,7 +72,7 @@ extern "C" {
 /**
 * Maximum concurrent clients supported
 */
-#define DRM_MAX_CLIENT_SUPPORTED 5
+#define DRM_MAX_CLIENT_SUPPORTED 10
 
 /**
 * Maximum callback data size
@@ -136,8 +136,6 @@ typedef struct {
  * @remark	It can be used to track drm clients.
  */
 typedef struct {
-	/** Active state for structure */
-	int active;
 
 	/** Client Id */
 	int client_id;

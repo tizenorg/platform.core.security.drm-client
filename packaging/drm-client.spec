@@ -1,6 +1,6 @@
 Name:       drm-client
 Summary:    DRM client Package
-Version:    0.0.23
+Version:    0.0.26
 Release:    0
 Group:      TO_BE/FILLED_IN
 License:    Apache

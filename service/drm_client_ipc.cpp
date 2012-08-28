@@ -120,33 +120,43 @@ void __search_client_info_cb(drm_client_cb_data_s* callinfo)
  * @see
  * @since       0.1
  */
-void *client_async_cb_handler(void *thread_arg)
-{
+void *client_async_cb_handler(void *thread_arg) {
 	drm_client_cb_data_s callinfo;
 	int retval = 0, result = 0;
-	memset(&callinfo, 0x00, sizeof(drm_client_cb_data_s));
 
 	/* This Async thread will be running for the entire process alive time
 	 * to handle all the async related operations sent from the server
 	 */
-	while(1)
- 	{
-		/* waiting for data on async socket */
-		if ((retval = read(async_sockfd, &callinfo, sizeof(drm_client_cb_data_s))) < 0) {
-			DRM_CLIENT_EXCEPTION(" Async call_back read error!!, retval = %d, error = %s",
-					retval, strerror(errno));
-			result = DRM_RETURN_COMMUNICATION_ERROR;
+	while (1) {
+		memset(&callinfo, 0x00, sizeof(drm_client_cb_data_s));
+		retval = read(async_sockfd, &callinfo, sizeof(drm_client_cb_data_s));
+		if (0 == retval) {
+			DRM_CLIENT_LOG("Read returns 0!, retval = %d", retval);
+			DRM_CLIENT_LOG("Server end closed!!!!");
+			/* Since server end closes
+			 * async socket creation needs to be done again
+			 */
 			goto ErrorExit;
+		} else if (retval < 0 || retval < sizeof(drm_client_cb_data_s)) {
+			DRM_CLIENT_EXCEPTION(
+					" Async call_back read error!!, retval = %d, error = %s",
+					retval, strerror(errno));
 		}
- 		DRM_CLIENT_LOG("Calling application  call back function from client");
 
- 		/* Search the client cb info from the received client_id and call corresponding handler */
- 		__search_client_info_cb(&callinfo);
- 	}
- 	ErrorExit:
- 	if(-1 != async_sockfd)
- 		close(async_sockfd);
- 	return NULL;
+		DRM_CLIENT_LOG(
+				"Calling application  call back function from client, retval = %d",
+				retval);
+		/* Search the client cb info from the received client_id and call corresponding handler */
+		__search_client_info_cb(&callinfo);
+	}
+
+ErrorExit:
+	pthread_mutex_lock(&async_mutex);
+	if (-1 != async_sockfd)
+		close(async_sockfd);
+	async_sockfd = -1;
+	pthread_mutex_unlock(&async_mutex);
+	return NULL;
 }
 
 
