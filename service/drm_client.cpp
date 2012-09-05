@@ -1025,6 +1025,18 @@ EXPORT_API int drm_process_request(drm_request_type_e request_type,
 					input, output);
 			return DRM_RETURN_INVALID_ARG;
 		} else {
+
+			DRM_CLIENT_LOG("initiator_url[%s]", ((drm_initiator_info_s*)input)->initiator_url);
+			DRM_CLIENT_LOG("initiator_url_len[%u]", ((drm_initiator_info_s*)input)->initiator_url_len);
+			DRM_CLIENT_LOG("operation_callback.callback[%p]", ((drm_initiator_info_s*)input)->operation_callback.callback);
+			DRM_CLIENT_LOG("init_type[%d]", ((drm_initiator_info_s*)input)->init_type);
+			DRM_CLIENT_LOG("custom_data.app_id[%s]", ((drm_initiator_info_s*)input)->custom_data.app_id);
+			DRM_CLIENT_LOG("custom_data.user_guid[%s]", ((drm_initiator_info_s*)input)->custom_data.user_guid);
+			DRM_CLIENT_LOG("custom_data.device_id[%s]", ((drm_initiator_info_s*)input)->custom_data.device_id);
+			DRM_CLIENT_LOG("custom_data.order_id[%s]", ((drm_initiator_info_s*)input)->custom_data.order_id);
+			DRM_CLIENT_LOG("custom_data.service_id[%s]", ((drm_initiator_info_s*)input)->custom_data.service_id);
+			DRM_CLIENT_LOG("custom_data.account_id[%s]", ((drm_initiator_info_s*)input)->custom_data.account_id);
+
 			/* Copy the input to Request Structure */
 			memcpy(req_data.fixed_data.request_data, input,
 					sizeof(drm_initiator_info_s));

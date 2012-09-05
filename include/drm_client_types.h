@@ -507,7 +507,7 @@ typedef enum {
 
 /**
  * @enum drm_initiator_type
- * @brief DRM Initiator type.
+ * @brief DRM Initiator type
  */
 typedef enum {
 	DRM_INITIATOR_TYPE_NONE = -1,
@@ -516,6 +516,22 @@ typedef enum {
 	DRM_INITIATOR_TYPE_JOIN_DOMAIN,
 	DRM_INITIATOR_TYPE_LEAVE_DOMAIN
 } drm_initiator_type;
+
+/**
+ * @enum drm_const_type_e
+ * @brief DRM constraint types
+ */
+typedef enum {
+	DRM_CONSTRAINT_TYPE_RENTAL = 0,
+	DRM_CONSTRAINT_TYPE_RENTAL_UNLIMITED,
+	DRM_CONSTRAINT_TYPE_PURCHASE,
+	DRM_CONSTRAINT_TYPE_BASE,
+	DRM_CONSTRAINT_TYPE_EXPIRED,
+	DRM_CONSTRAINT_TYPE_NOT_AUTHORIZED,
+	DRM_CONSTRAINT_TYPE_INVALID_DRM_VERSION,
+	DRM_CONSTRAINT_TYPE_UNKNOWN_TYPE,
+	DRM_CONSTRAINT_TYPE_GENERAL_ERROR
+} drm_const_type_e;
 
 /**
  * @struct drm_content_info_s
@@ -589,14 +605,15 @@ typedef struct {
  * @brief DRM Constraint type structure.
  */
 typedef struct {
-	int is_unlimited;		/**< Unlimited constraints */
-	int is_count;			/**< Count constraint present/not present */
-	int is_datetime;		/**< Datetime constraint present/not present */
-	int is_interval;		/**< Interval constraint present/not present */
-	int is_timedcount;		/**< TimedCount constraint present/not present */
-	int is_accumulated;		/**< Accumulated constraint present/not present */
-	int is_individual;		/**< Individual constraint present/not present */
-	int is_system;			/**< System constraint present/not present */
+	int is_unlimited;		                  /**< Unlimited constraints */
+	int is_count;			                  /**< Count constraint present/not present */
+	int is_datetime;		                  /**< Datetime constraint present/not present */
+	int is_interval;		                  /**< Interval constraint present/not present */
+	int is_timedcount;		                  /**< TimedCount constraint present/not present */
+	int is_accumulated;		                  /**< Accumulated constraint present/not present */
+	int is_individual;		                  /**< Individual constraint present/not present */
+	int is_system;			                  /**< System constraint present/not present */
+	drm_const_type_e constraint_type;         /**< Divx constraint types */
 } drm_constraint_type_s;
 
 /**

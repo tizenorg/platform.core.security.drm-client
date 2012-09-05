@@ -27,6 +27,7 @@
  * @brief       DRM Client Inter process communication definitions.
  * @author      Mahendra Kumar Prajapat (mahendra.p@samsung.com)
  * @author      Harsha Shekar (h.shekar@samsung.com)
+ * @author      Ravi S (ravi.cs@samsung.com)
  * @version     0.1
  * @history     0.1: DRM Client Inter process communication definitions.
  */
@@ -175,7 +176,7 @@ static int  __create_async_socket(drm_request_data_s *client_in)
 {
 	struct sockaddr_un clientaddr;
 	int temp_len_sock = 0;
-	unsigned int retval = 0;
+	int retval = 0;
 	drm_result_e result = DRM_RETURN_SUCCESS;
 	pthread_t async_thread = 0;
 	int rv = 0;
@@ -250,7 +251,7 @@ static int __get_socket(drm_request_data_s *client_in)
 {
 	int fd;
 	int temp_len_sock = 0;
-	unsigned int retval = 0;
+	int retval = 0;
 	struct sockaddr_un clientaddr;
 	static int num_clients = 0;
 
@@ -280,21 +281,6 @@ static int __get_socket(drm_request_data_s *client_in)
 	DRM_CLIENT_LOG("Client_id = %d", client_info.client_id);
 	client_info.sync_sock_fd = fd;
 	client_info.async_sock_fd = async_sockfd;
-
-	/* Store the callback on a thread basis to be handled for each client */
-	if (((drm_initiator_info_s*) (client_in->fixed_data.request_data))->operation_callback.callback) {
-		if (num_clients <= (DRM_MAX_CLIENT_SUPPORTED - 1)) {
-			DRM_CLIENT_LOG("num_clients = %d", num_clients);
-			client_cb_info[num_clients].client_id = client_info.client_id;
-			memcpy(&client_cb_info[num_clients].operation_callback,
-					&(((drm_initiator_info_s*) (client_in->fixed_data.request_data))->operation_callback),
-					sizeof(drm_operation_cb_s));
-			num_clients++;
-		} else {
-			DRM_CLIENT_EXCEPTION("Num of clients exceeded!!, num_clients = %d", num_clients);
-			goto ErrorExit;
-		}
-	}
 
 	DRM_CLIENT_LOG("Writing socket sockfd = %d size=%d",fd,sizeof(client_info));
 
@@ -326,7 +312,7 @@ ErrorExit:
  */
 int drm_client_comm(drm_request_data_s *client_in, drm_response_data_s *server_out)
 {
-	unsigned int retval = 0;
+	int retval = 0;
 	drm_request_data_s send_data;
 	drm_response_data_s recv_data;
 	drm_result_e result = DRM_RETURN_SUCCESS;
@@ -362,6 +348,34 @@ int drm_client_comm(drm_request_data_s *client_in, drm_response_data_s *server_o
 			DRM_CLIENT_EXCEPTION("get_socket failed sockfd = %d", sockfd);
 			result = DRM_RETURN_COMMUNICATION_ERROR;
 			goto ErrorExit;
+		}
+	}
+
+	/* Store the callback on a thread basis to be handled for each client */
+	DRM_CLIENT_LOG("Callback = %p", ((drm_initiator_info_s*) (client_in->fixed_data.request_data))->operation_callback.callback);
+	DRM_CLIENT_LOG("Client id = %d", client_info.client_id);
+
+	if (((drm_initiator_info_s*) (client_in->fixed_data.request_data))->operation_callback.callback) {
+		/* Callback present, store if not yet stored
+		 * Loop through the list checking for client id if stored */
+		int loop = 0;
+		for (; loop < DRM_MAX_CLIENT_SUPPORTED; loop++) {
+			if (client_cb_info[loop].client_id == client_info.client_id) {
+				DRM_CLIENT_LOG("Callback info already stored!!, client_id[%d] = %d",
+						loop, client_cb_info[loop].client_id);
+				break;
+			} else if (client_cb_info[loop].client_id == 0) {
+				DRM_CLIENT_LOG("No entry for cb yet, loop = %d", loop);
+				DRM_CLIENT_LOG("Empty structure, storing client callback here, id = %d", client_info.client_id);
+				client_cb_info[loop].client_id = client_info.client_id;
+				memcpy(&client_cb_info[loop].operation_callback,
+						&(((drm_initiator_info_s*) (client_in->fixed_data.request_data))->operation_callback),
+						sizeof(drm_operation_cb_s));
+				break;
+			}
+		}
+		if (DRM_MAX_CLIENT_SUPPORTED == loop) {
+			DRM_CLIENT_LOG("loop = %d, Maximum clients reached!!!", loop);
 		}
 	}
 
