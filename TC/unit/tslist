@@ -1,0 +1,9 @@
+/unit/utc_drmclient_drm_is_drm_file_func
+/unit/utc_drmclient_drm_process_request_func
+/unit/utc_drmclient_drm_get_file_type_func
+/unit/utc_drmclient_drm_get_license_status_func
+/unit/utc_drmclient_drm_get_content_info_func
+/unit/utc_drmclient_drm_get_file_info_func
+/unit/utc_drmclient_drm_get_constraint_info_func
+/unit/utc_drmclient_drm_is_action_allowed_func
+/unit/utc_drmclient_drm_get_data_func
