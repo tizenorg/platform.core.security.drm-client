@@ -1,0 +1,6 @@
+Name: drm-client
+Description: DRM client Package
+Version: @VERSION@
+Requires: dlog capi-base-common glib-2.0
+Libs: -L@LIBDIR@ -ldrm-client
+Cflags: -I@INCLUDEDIR@/drm-client
