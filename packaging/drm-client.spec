@@ -5,6 +5,7 @@ Release:    0
 Group:      TO_BE/FILLED_IN
 License:    Apache
 Source0:    %{name}-%{version}.tar.gz
+Source1001: 	drm-client.manifest
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(capi-base-common)
 BuildRequires:  pkgconfig(glib-2.0)
@@ -23,6 +24,7 @@ Development files for %{name}
 
 %prep
 %setup -q
+cp %{SOURCE1001} .
 
 %build
 %cmake .
@@ -34,10 +36,12 @@ rm -rf %{buildroot}
 %make_install
 
 %files
+%manifest %{name}.manifest
 %defattr(-,root,root,-)
 %{_libdir}/*.so.*
 
 %files devel
+%manifest %{name}.manifest
 %defattr(-,root,root,-)
 %{_includedir}/drm-client/*
 %{_libdir}/*.so
