@@ -1,0 +1,8 @@
+Change-Id: I5e16bb61c5930117591c2c386eb8a142d8abbed9
+Code-Review+2: Ryan Ware <ware@linux.intel.com>
+Verified+1: Ryan Ware <ware@linux.intel.com>
+Submitted-by: Ryan Ware <ware@linux.intel.com>
+Submitted-at: Mon, 08 Jul 2013 10:07:20 -0700
+Reviewed-on: https://review.tizen.org/gerrit/4484
+Project: platform/core/security/drm-client
+Branch: refs/heads/tizen
