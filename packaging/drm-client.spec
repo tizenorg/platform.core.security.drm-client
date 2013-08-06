@@ -2,8 +2,8 @@ Name:       drm-client
 Summary:    DRM client Package
 Version:    0.0.30
 Release:    0
-Group:      TO_BE/FILLED_IN
-License:    Apache
+Group:      Security/Libraries
+License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
 Source1001: 	drm-client.manifest
 BuildRequires:  pkgconfig(dlog)
@@ -17,7 +17,7 @@ DRM client library (Shared Object)
 
 %package devel
 Summary:    Development files for %{name}
-Group:      Development/Libraries
+Group:      Security/Development
 Requires:   %{name} = %{version}-%{release}
 %description devel
 Development files for %{name}
@@ -34,6 +34,10 @@ make %{?jobs:-j%jobs}
 %install
 rm -rf %{buildroot}
 %make_install
+
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %files
 %manifest %{name}.manifest

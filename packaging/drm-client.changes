@@ -1,0 +1,4 @@
+* Tue Aug  6 00:50:41 UTC 2013 - tracy.graydon@intel.com
+- Fix rpmlint failures on license and groups. 
+- Added drm-client.changes file
+
